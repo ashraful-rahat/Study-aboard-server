@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { userServices } from '../services/user.service';
 import { StatusCodes } from 'http-status-codes';
-import { IUser } from '../interfaces/user.interface';
 import { cloudinary } from '../utils/cloudinary';
 
 const createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
