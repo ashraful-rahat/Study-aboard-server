@@ -1,19 +1,25 @@
 import { z } from 'zod';
 
+// Helper to validate a MongoDB ObjectId (24 hex characters)
+const objectIdValidator = z.string().regex(/^[0-9a-fA-F]{24}$/, {
+  message: 'Invalid ObjectId',
+});
+
 const createUniversitySchema = z.object({
   body: z.object({
-    name: z.string().min(1),
-    description: z.string().min(1),
-    location: z.string().min(1),
-    destinationId: z.string().min(1), // should be a valid ObjectId
+    name: z.string().min(1, 'Name is required'),
+    description: z.string().min(1, 'Description is required'),
+    location: z.string().min(1, 'Location is required'),
+    destinationId: objectIdValidator,
     establishedYear: z.number().optional(),
     website: z.string().url().optional(),
+    image: z.string().url().optional(), // ✅ added image validation
   }),
 });
 
 const getSingleSchema = z.object({
   params: z.object({
-    id: z.string().min(1),
+    id: objectIdValidator,
   }),
 });
 
@@ -22,12 +28,13 @@ const updateUniversitySchema = z.object({
     name: z.string().optional(),
     description: z.string().optional(),
     location: z.string().optional(),
-    destinationId: z.string().optional(),
+    destinationId: objectIdValidator.optional(),
     establishedYear: z.number().optional(),
     website: z.string().url().optional(),
+    image: z.string().url().optional(), // ✅ added image validation
   }),
   params: z.object({
-    id: z.string().min(1),
+    id: objectIdValidator,
   }),
 });
 

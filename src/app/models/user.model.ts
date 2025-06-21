@@ -38,6 +38,13 @@ const UserSchema = new Schema<IUser>(
     photo: {
       type: String,
       default: null,
+      validate: {
+        validator: (value: string) => {
+          if (!value) return true;
+          return value.startsWith('http') || value.startsWith('https');
+        },
+        message: 'Photo must be a valid URL',
+      },
     },
 
     phone: {

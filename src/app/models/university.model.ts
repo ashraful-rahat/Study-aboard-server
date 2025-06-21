@@ -9,6 +9,7 @@ const universitySchema = new Schema<IUniversity>(
     destinationId: { type: Schema.Types.ObjectId, ref: 'Destination', required: true },
     establishedYear: { type: Number },
     website: { type: String },
+    image: { type: String }, // ← added image field
   },
   { timestamps: true },
 );
