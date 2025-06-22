@@ -2,11 +2,15 @@ import express from 'express';
 import { UniversityValidation } from '../validations/university.validation';
 import validateRequest from '../middlewares/validateRequest';
 import { universityController } from '../controllers/university.controller';
+import { uploadSingle } from '../middlewares/upload';
+import { parseJsonData } from '../middlewares/parseJsonData';
 
 const router = express.Router();
 
 router.post(
   '/create-university',
+  uploadSingle, // ← multer with Cloudinary
+  parseJsonData, // ← to handle JSON data + image
   validateRequest(UniversityValidation.createUniversitySchema),
   universityController.createUniversity,
 );
@@ -21,6 +25,8 @@ router.get(
 
 router.patch(
   '/:id',
+  uploadSingle,
+  parseJsonData,
   validateRequest(UniversityValidation.updateUniversitySchema),
   universityController.updateUniversity,
 );
