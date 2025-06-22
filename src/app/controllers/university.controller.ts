@@ -8,7 +8,7 @@ const createUniversity = async (req: Request, res: Response, next: NextFunction)
     const universityData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
 
     if (req.file) {
-      universityData.image = req.file.path;
+      universityData.photo = req.file.path; // ✅ ঠিক ফিল্ডে সেট করছেন
     }
 
     const result = await universityService.createUniversity(universityData);
@@ -80,31 +80,13 @@ const getSingleUniversity = async (
 
 const updateUniversity = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
-    const universityData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
+    const updateData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
 
     if (req.file) {
-      // Remove old image if exists
-      const existing = await universityService.getUniversityById(id);
-      if (existing?.photo) {
-        const publicId = existing.photo.split('/').pop()?.split('.')[0];
-        if (publicId) {
-          await cloudinary.uploader.destroy(publicId);
-        }
-      }
-
-      universityData.image = req.file.path;
+      updateData.photo = req.file.path; // ✅ Correct field
     }
 
-    const result = await universityService.updateUniversity(id, universityData);
-
-    if (!result) {
-      res.status(httpStatus.NOT_FOUND).json({
-        status: 'fail',
-        message: 'University not found',
-      });
-      return;
-    }
+    const result = await universityService.updateUniversity(req.params.id, updateData);
 
     res.status(httpStatus.OK).json({
       status: 'success',
@@ -115,7 +97,6 @@ const updateUniversity = async (req: Request, res: Response, next: NextFunction)
     next(error);
   }
 };
-
 const deleteUniversity = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;

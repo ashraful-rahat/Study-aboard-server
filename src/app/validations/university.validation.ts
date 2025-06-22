@@ -23,7 +23,7 @@ const createUniversitySchema = z.object({
         return num;
       }),
     website: z.string().url().optional(),
-    image: z.string().url().optional(), // ✅ added image validation
+    photo: z.string().url().optional(), // ✅ added image validation
   }),
 });
 

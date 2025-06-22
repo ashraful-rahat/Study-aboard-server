@@ -1,17 +1,25 @@
 import express from 'express';
+
 import { UserValidation } from '../validations/user.validation';
 import validateRequest from '../middlewares/validateRequest';
 import { userController } from '../controllers/user.controller';
 import { uploadSingle } from '../middlewares/upload';
 import { parseJsonData } from '../middlewares/parseJsonData';
+import { authMiddleware } from '../middlewares/auth';
+import { authorizeRoles } from '../middlewares/authorize';
 
 const router = express.Router();
+
+// Middleware add করো এখানে
+router.use(authMiddleware);
+router.use(authorizeRoles('admin'));
+
 router.post(
   '/create-user',
-  uploadSingle, // 1) Multer
-  parseJsonData, // 2) Properly‑typed JSON parser
-  validateRequest(UserValidation.userValidationSchema), // 3) Zod
-  userController.createUser, // 4) Controller
+  uploadSingle,
+  parseJsonData,
+  validateRequest(UserValidation.userValidationSchema),
+  userController.createUser,
 );
 
 router.get('/', userController.allUser);
