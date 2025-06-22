@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+
 export interface AuthenticatedRequest extends Request {
   user?: any;
 }
@@ -12,6 +12,7 @@ export const authMiddleware = (
   const token = req.headers.authorization?.split(' ')[1]; // 'Bearer TOKEN'
 
   if (!token) {
+    console.log('No token provided');
     res.status(401).json({ message: 'No token provided' });
     return; // return করে ফাংশন শেষ করতে হবে
   }
@@ -19,9 +20,12 @@ export const authMiddleware = (
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
     req.user = decoded;
+    console.log('User authenticated:', req.user);
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });
     return; // return করতে হবে
   }
 };
+
+import jwt from 'jsonwebtoken';
