@@ -5,6 +5,7 @@ import { authRoutes } from './app/routes/auth.route';
 import { destinationRoutes } from './app/routes/destination.route';
 import { universityRoutes } from './app/routes/university.route';
 import { courseRoutes } from './app/routes/course.route';
+import { applicationRoutes } from './app/routes/application.route';
 
 const app: Application = express();
 
@@ -18,6 +19,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/destination', destinationRoutes);
 app.use('/api/v1/university', universityRoutes);
 app.use('/api/v1/courses', courseRoutes);
+app.use('/api/v1/applications', applicationRoutes);
 
 // Health Check Route
 app.get('/', (req, res) => {
