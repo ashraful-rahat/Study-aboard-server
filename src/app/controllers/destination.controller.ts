@@ -1,17 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status';
 import { destinationService } from '../services/destination.service';
+import { cloudinary } from '../utils/cloudinary';
 
 // CREATE
 const createDestination = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await destinationService.createDestination(req.body);
+    const destinationData =
+      typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
+
+    if (req.file) {
+      destinationData.photo = req.file.path;
+    }
+
+    const result = await destinationService.createDestination(destinationData);
+
     res.status(httpStatus.CREATED).json({
       status: 'success',
       message: 'Destination created successfully',
       data: result,
     });
   } catch (error: any) {
+    if (req.file) {
+      const publicId = req.file.path.split('/').pop()?.split('.')[0];
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
     if (error.code === 11000) {
       res.status(httpStatus.CONFLICT).json({
         status: 'fail',
@@ -19,6 +35,7 @@ const createDestination = async (req: Request, res: Response, next: NextFunction
       });
       return;
     }
+
     next(error);
   }
 };
@@ -71,7 +88,21 @@ const getSingleDestination = async (req: Request, res: Response, next: NextFunct
 const updateDestination = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const result = await destinationService.updateDestination(id, req.body);
+    const updateData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
+
+    if (req.file) {
+      // Delete old photo
+      const existing = await destinationService.getDestinationById(id);
+      if (existing?.photo) {
+        const publicId = existing.photo.split('/').pop()?.split('.')[0];
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+        }
+      }
+      updateData.photo = req.file.path;
+    }
+
+    const result = await destinationService.updateDestination(id, updateData);
 
     if (!result) {
       res.status(httpStatus.NOT_FOUND).json({
@@ -87,6 +118,13 @@ const updateDestination = async (req: Request, res: Response, next: NextFunction
       data: result,
     });
   } catch (error: any) {
+    if (req.file) {
+      const publicId = req.file.path.split('/').pop()?.split('.')[0];
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
     if (error.code === 11000) {
       res.status(httpStatus.CONFLICT).json({
         status: 'fail',

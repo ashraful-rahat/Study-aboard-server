@@ -23,7 +23,7 @@ const universitySchema = new Schema<IUniversity>(
       },
     },
 
-    image: {
+    photo: {
       type: String,
       default: null,
       validate: {

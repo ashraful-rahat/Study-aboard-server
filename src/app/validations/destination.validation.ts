@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Create schema for creating a destination
 const destinationValidationSchema = z.object({
   body: z.object({
     name: z.string({ required_error: 'Name is required' }).trim().min(1, 'Name cannot be empty'),
@@ -15,15 +14,16 @@ const destinationValidationSchema = z.object({
       .trim()
       .min(1, 'Country cannot be empty'),
 
-    images: z.array(z.string().url('Invalid URL format')).optional().default([]),
+    photo: z.array(z.string().url('Invalid URL format')).optional().default([]),
 
     bestTimeToVisit: z.string().optional().nullable(),
 
     visaRequirements: z.string().optional().nullable(),
+
+    studentVisa: z.string().optional().nullable(), // <-- Add here
   }),
 });
 
-// Create schema for updating a destination (partial)
 const updateDestinationValidationSchema = z.object({
   body: z.object({
     name: z.string().trim().min(1, 'Name cannot be empty').optional(),
@@ -32,10 +32,10 @@ const updateDestinationValidationSchema = z.object({
     images: z.array(z.string().url('Invalid URL format')).optional(),
     bestTimeToVisit: z.string().optional().nullable(),
     visaRequirements: z.string().optional().nullable(),
+    studentVisa: z.string().optional().nullable(), // <-- Add here
   }),
 });
 
-// Schema for validating just the destination ID param (used in GET / PATCH / DELETE)
 const getDestinationValidationSchema = z.object({
   params: z.object({
     id: z.string().min(1, 'Destination ID is required'),
@@ -48,6 +48,5 @@ export const DestinationValidation = {
   getDestinationValidationSchema,
 };
 
-// Optional types for use in TS types elsewhere
 export type DestinationInput = z.infer<typeof destinationValidationSchema>['body'];
 export type DestinationUpdateInput = z.infer<typeof updateDestinationValidationSchema>['body'];

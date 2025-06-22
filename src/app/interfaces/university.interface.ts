@@ -7,5 +7,5 @@ export interface IUniversity {
   destinationId: Types.ObjectId;
   establishedYear?: number;
   website?: string;
-  image?: string; // ← added image field
+  photo?: string; // ← added image field
 }

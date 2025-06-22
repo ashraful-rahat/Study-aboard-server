@@ -2,9 +2,8 @@ export interface IDestination {
   name: string;
   description: string;
   country: string;
-  images: string[]; // Will store Cloudinary/ImgBB URLs
-  bestTimeToVisit: string;
-  visaRequirements: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  photo?: string; // ✅ optional image URL
+  bestTimeToVisit?: string;
+  visaRequirements?: string;
+  studentVisa?: string | null; // Add this line
 }

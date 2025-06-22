@@ -11,7 +11,17 @@ const createUniversitySchema = z.object({
     description: z.string().min(1, 'Description is required'),
     location: z.string().min(1, 'Location is required'),
     destinationId: objectIdValidator,
-    establishedYear: z.number().optional(),
+    establishedYear: z
+      .string()
+      .optional()
+      .transform((val) => {
+        if (val === undefined) return undefined;
+        const num = Number(val);
+        if (isNaN(num)) {
+          throw new Error('Invalid number format for establishedYear'); // Or handle with .pipe()
+        }
+        return num;
+      }),
     website: z.string().url().optional(),
     image: z.string().url().optional(), // ✅ added image validation
   }),
@@ -31,7 +41,7 @@ const updateUniversitySchema = z.object({
     destinationId: objectIdValidator.optional(),
     establishedYear: z.number().optional(),
     website: z.string().url().optional(),
-    image: z.string().url().optional(), // ✅ added image validation
+    photo: z.string().url().optional(), // ✅ added image validation
   }),
   params: z.object({
     id: objectIdValidator,
