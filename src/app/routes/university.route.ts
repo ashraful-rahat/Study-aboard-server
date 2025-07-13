@@ -1,3 +1,4 @@
+// src/routes/university.routes.ts
 import express from 'express';
 import { UniversityValidation } from '../validations/university.validation';
 import validateRequest from '../middlewares/validateRequest';
@@ -9,23 +10,25 @@ import { authorizeRoles } from '../middlewares/authorize';
 
 const router = express.Router();
 
-router.use(authMiddleware);
-router.use(authorizeRoles('admin'));
-
-router.post(
-  '/create-university',
-  uploadSingle, // ← multer with Cloudinary
-  parseJsonData, // ← to handle JSON data + image
-  validateRequest(UniversityValidation.createUniversitySchema),
-  universityController.createUniversity,
-);
-
+// ✅ PUBLIC ROUTES (for frontend)
 router.get('/', universityController.getAllUniversities);
 
 router.get(
   '/:id',
   validateRequest(UniversityValidation.getSingleSchema),
   universityController.getSingleUniversity,
+);
+
+// 🛡️ ADMIN ONLY (create/update/delete)
+router.use(authMiddleware);
+router.use(authorizeRoles('admin'));
+
+router.post(
+  '/create-university',
+  uploadSingle,
+  parseJsonData,
+  validateRequest(UniversityValidation.createUniversitySchema),
+  universityController.createUniversity,
 );
 
 router.patch(
