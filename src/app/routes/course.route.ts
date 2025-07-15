@@ -6,6 +6,8 @@ import { uploadSingle } from '../middlewares/upload';
 import { parseJsonData } from '../middlewares/parseJsonData';
 
 const router = express.Router();
+// ✅ PUBLIC ROUTES (for frontend)
+router.get('/', courseController.getAllCourses);
 
 router.post(
   '/create-course',

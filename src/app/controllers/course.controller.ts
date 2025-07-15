@@ -7,8 +7,12 @@ const createCourse = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const data = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
 
+    // Upload image to Cloudinary
     if (req.file) {
-      data.image = req.file.path;
+      const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'courses',
+      });
+      data.photo = uploadedImage.secure_url; // ✅ Correct field name for the Course model
     }
 
     const result = await courseService.createCourse(data);
@@ -22,13 +26,12 @@ const createCourse = async (req: Request, res: Response, next: NextFunction) => 
     if (req.file) {
       const publicId = req.file.path.split('/').pop()?.split('.')[0];
       if (publicId) {
-        await cloudinary.uploader.destroy(publicId);
+        await cloudinary.uploader.destroy(`courses/${publicId}`);
       }
     }
     next(error);
   }
 };
-
 const getAllCourses = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await courseService.getAllCourses();
