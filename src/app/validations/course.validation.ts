@@ -1,3 +1,4 @@
+// validations/course.validation.ts
 import { z } from 'zod';
 
 const objectId = z.string().regex(/^[0-9a-fA-F]{24}$/, {
@@ -8,12 +9,15 @@ const createCourseSchema = z.object({
   body: z.object({
     name: z.string().min(1),
     description: z.string().min(1),
-    // FIX: Expect string from form-data, coerce to number
-    duration: z.coerce.number().min(1, 'Duration must be at least 1'), // Assuming duration is a number (e.g., years)
+
+    duration: z.coerce.number().min(1, 'Duration must be at least 1'),
     universityId: objectId,
-    // FIX: Expect string from form-data, coerce to number
-    tuitionFee: z.coerce.number().optional(), // Can still be optional, but will coerce if present
-    image: z.string().url().optional(), // If you're sending a URL for an existing image
+
+    tuitionFee: z.coerce.number().optional(),
+    photo: z.string().url().optional(),
+
+    programType: z.enum(['Bachelor', 'Master', 'Diploma']).optional(),
+    category: z.string().optional(),
   }),
 });
 
@@ -24,12 +28,15 @@ const updateCourseSchema = z.object({
   body: z.object({
     name: z.string().optional(),
     description: z.string().optional(),
-    // FIX: Expect string from form-data, coerce to number
-    duration: z.coerce.number().optional(), // Make optional and coerce
+
+    duration: z.coerce.number().optional(),
     universityId: objectId.optional(),
-    // FIX: Expect string from form-data, coerce to number
-    tuitionFee: z.coerce.number().optional(), // Make optional and coerce
-    photo: z.string().url().optional(), // Assuming 'photo' for update
+
+    tuitionFee: z.coerce.number().optional(),
+    photo: z.string().url().optional(),
+
+    programType: z.enum(['Bachelor', 'Master', 'Diploma']).optional(),
+    category: z.string().optional(),
   }),
 });
 

@@ -1,3 +1,4 @@
+// models/course.model.ts
 import { Schema, model } from 'mongoose';
 import { ICourse } from '../interfaces/course.interface';
 
@@ -10,9 +11,20 @@ const courseSchema = new Schema<ICourse>(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
-    duration: { type: String, required: true }, // Example: '2 Years', '6 Months'
+    duration: { type: String, required: true },
     tuitionFee: { type: Number, required: true },
     subject: { type: String },
+
+    programType: {
+      type: String,
+      enum: ['Bachelor', 'Master', 'Diploma'],
+      required: false,
+    },
+
+    category: {
+      type: String,
+      required: false,
+    },
 
     universityId: {
       type: Schema.Types.ObjectId,

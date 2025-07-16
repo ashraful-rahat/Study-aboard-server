@@ -1,3 +1,4 @@
+// interfaces/course.interface.ts
 import { Types } from 'mongoose';
 
 export interface ICourse {
@@ -8,4 +9,6 @@ export interface ICourse {
   universityId: Types.ObjectId;
   subject?: string;
   photo?: string;
+  programType?: string;
+  category?: string;
 }

@@ -1,3 +1,5 @@
+// controllers/course.controller.ts
+
 import { Request, Response, NextFunction } from 'express';
 import { courseService } from '../services/course.service';
 import httpStatus from 'http-status';
@@ -7,12 +9,11 @@ const createCourse = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const data = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
 
-    // Upload image to Cloudinary
     if (req.file) {
       const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
         folder: 'courses',
       });
-      data.photo = uploadedImage.secure_url; // ✅ Correct field name for the Course model
+      data.photo = uploadedImage.secure_url;
     }
 
     const result = await courseService.createCourse(data);
@@ -32,9 +33,19 @@ const createCourse = async (req: Request, res: Response, next: NextFunction) => 
     next(error);
   }
 };
+
 const getAllCourses = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await courseService.getAllCourses();
+    const filters = req.query; // req.query থেকে সমস্ত ক্যুয়ারি প্যারামিটার গ্রহণ করুন
+
+    // programType, category, searchQuery extract করুন এবং string বা undefined নিশ্চিত করুন
+    const programType = filters.programType as string | undefined;
+    const category = filters.category as string | undefined;
+    const searchQuery = filters.searchQuery as string | undefined;
+
+    // courseService.getAllCourses এ ফিল্টার অবজেক্টটি পাস করুন
+    const result = await courseService.getAllCourses({ programType, category, searchQuery });
+
     res.status(httpStatus.OK).json({
       status: 'success',
       results: result.length,
@@ -80,7 +91,10 @@ const updateCourse = async (req: Request, res: Response, next: NextFunction) => 
         await cloudinary.uploader.destroy(publicId);
       }
 
-      courseData.image = req.file.path;
+      const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'courses',
+      });
+      courseData.photo = uploadedImage.secure_url;
     }
 
     const result = await courseService.updateCourse(id, courseData);
