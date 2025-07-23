@@ -14,7 +14,7 @@ const destinationValidationSchema = z.object({
       .trim()
       .min(1, 'Country cannot be empty'),
 
-    photo: z.array(z.string().url('Invalid URL format')).optional().default([]),
+    photo: z.string().optional().nullable(), // changed here
 
     bestTimeToVisit: z.string().optional().nullable(),
 
@@ -29,7 +29,7 @@ const updateDestinationValidationSchema = z.object({
     name: z.string().trim().min(1, 'Name cannot be empty').optional(),
     description: z.string().trim().min(1, 'Description cannot be empty').optional(),
     country: z.string().trim().min(1, 'Country cannot be empty').optional(),
-    images: z.array(z.string().url('Invalid URL format')).optional(),
+    photo: z.array(z.string().url('Invalid URL format')).optional().default([]),
     bestTimeToVisit: z.string().optional().nullable(),
     visaRequirements: z.string().optional().nullable(),
     studentVisa: z.string().optional().nullable(), // <-- Add here

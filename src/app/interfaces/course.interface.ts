@@ -5,10 +5,11 @@ export interface ICourse {
   name: string;
   description: string;
   duration: string;
+  universityId: Types.ObjectId; // reference
+  universityName: string;
   tuitionFee: number;
-  universityId: Types.ObjectId;
-  subject?: string;
   photo?: string;
-  programType?: string;
+  programType?: 'Bachelor' | 'Master' | 'Diploma';
   category?: string;
+  subject?: string;
 }

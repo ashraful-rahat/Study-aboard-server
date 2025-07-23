@@ -32,7 +32,7 @@ const getAllCourses = async (filters: {
     ];
   }
 
-  return await Course.find(query).populate('universityId').sort('-createdAt');
+  return await Course.find(query).sort('-createdAt');
 };
 
 const getSingleCourse = async (id: string) => {

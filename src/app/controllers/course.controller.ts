@@ -1,11 +1,10 @@
-// controllers/course.controller.ts
-
 import { Request, Response, NextFunction } from 'express';
-import { courseService } from '../services/course.service';
 import httpStatus from 'http-status';
+import { courseService } from '../services/course.service';
 import { cloudinary } from '../utils/cloudinary';
 
-const createCourse = async (req: Request, res: Response, next: NextFunction) => {
+// CREATE
+const createCourse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const data = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
 
@@ -23,28 +22,36 @@ const createCourse = async (req: Request, res: Response, next: NextFunction) => 
       message: 'Course created successfully',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Cleanup uploaded image on error
     if (req.file) {
       const publicId = req.file.path.split('/').pop()?.split('.')[0];
       if (publicId) {
         await cloudinary.uploader.destroy(`courses/${publicId}`);
       }
     }
+
+    if (error.code === 11000) {
+      res.status(httpStatus.CONFLICT).json({
+        status: 'fail',
+        message: 'Course already exists',
+      });
+      return;
+    }
+
     next(error);
   }
 };
 
-const getAllCourses = async (req: Request, res: Response, next: NextFunction) => {
+// READ - All courses
+const getAllCourses = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const filters = req.query; // req.query থেকে সমস্ত ক্যুয়ারি প্যারামিটার গ্রহণ করুন
-
-    // programType, category, searchQuery extract করুন এবং string বা undefined নিশ্চিত করুন
-    const programType = filters.programType as string | undefined;
-    const category = filters.category as string | undefined;
-    const searchQuery = filters.searchQuery as string | undefined;
-
-    // courseService.getAllCourses এ ফিল্টার অবজেক্টটি পাস করুন
-    const result = await courseService.getAllCourses({ programType, category, searchQuery });
+    const { programType, category, searchQuery } = req.query;
+    const result = await courseService.getAllCourses({
+      programType: programType as string,
+      category: category as string,
+      searchQuery: searchQuery as string,
+    });
 
     res.status(httpStatus.OK).json({
       status: 'success',
@@ -56,9 +63,11 @@ const getAllCourses = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-const getSingleCourse = async (req: Request, res: Response, next: NextFunction) => {
+// READ - Single course
+const getSingleCourse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const result = await courseService.getSingleCourse(req.params.id);
+    const { id } = req.params;
+    const result = await courseService.getSingleCourse(id);
 
     if (!result) {
       res.status(httpStatus.NOT_FOUND).json({
@@ -72,23 +81,31 @@ const getSingleCourse = async (req: Request, res: Response, next: NextFunction) 
       status: 'success',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'CastError') {
+      res.status(httpStatus.BAD_REQUEST).json({
+        status: 'fail',
+        message: 'Invalid course ID format',
+      });
+      return;
+    }
     next(error);
   }
 };
 
-const updateCourse = async (req: Request, res: Response, next: NextFunction) => {
+// UPDATE
+const updateCourse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-    const courseData = req.body;
+    const courseData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
 
     if (req.file) {
       const existing = await courseService.getSingleCourse(id);
-      const oldImage = existing?.photo;
-      const publicId = oldImage?.split('/').pop()?.split('.')[0];
-
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId);
+      if (existing?.photo) {
+        const publicId = existing.photo.split('/').pop()?.split('.')[0];
+        if (publicId) {
+          await cloudinary.uploader.destroy(`courses/${publicId}`);
+        }
       }
 
       const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
@@ -112,14 +129,31 @@ const updateCourse = async (req: Request, res: Response, next: NextFunction) => 
       message: 'Course updated successfully',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (req.file) {
+      const publicId = req.file.path.split('/').pop()?.split('.')[0];
+      if (publicId) {
+        await cloudinary.uploader.destroy(`courses/${publicId}`);
+      }
+    }
+
+    if (error.code === 11000) {
+      res.status(httpStatus.CONFLICT).json({
+        status: 'fail',
+        message: 'Course already exists',
+      });
+      return;
+    }
+
     next(error);
   }
 };
 
-const deleteCourse = async (req: Request, res: Response, next: NextFunction) => {
+// DELETE
+const deleteCourse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const course = await courseService.getSingleCourse(req.params.id);
+    const { id } = req.params;
+    const course = await courseService.getSingleCourse(id);
 
     if (!course) {
       res.status(httpStatus.NOT_FOUND).json({
@@ -132,11 +166,11 @@ const deleteCourse = async (req: Request, res: Response, next: NextFunction) => 
     if (course.photo) {
       const publicId = course.photo.split('/').pop()?.split('.')[0];
       if (publicId) {
-        await cloudinary.uploader.destroy(publicId);
+        await cloudinary.uploader.destroy(`courses/${publicId}`);
       }
     }
 
-    await courseService.deleteCourse(req.params.id);
+    await courseService.deleteCourse(id);
 
     res.status(httpStatus.OK).json({
       status: 'success',
