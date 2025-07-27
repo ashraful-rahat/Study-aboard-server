@@ -2,13 +2,11 @@ import multer, { FileFilterCallback } from 'multer';
 import { storage } from '../utils/cloudinary';
 import { Request } from 'express';
 
-// Strongly typed file filter
 const fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => void = (
   req,
   file,
   cb,
 ) => {
-  // Accept only image mimetypes
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
@@ -16,17 +14,14 @@ const fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallba
   }
 };
 
-// Configure multer instance with Cloudinary storage
 const upload = multer({
-  storage,
+  storage, // ✅ cloudinaryStorage
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
   },
   fileFilter,
 });
 
-// Single file upload middleware (field name: 'photo')
+// ✅ Middleware exports
 export const uploadSingle = upload.single('photo');
-
-// Multiple files upload middleware (field name: 'photo', max 10 files)
 export const uploadMultiple = upload.array('photo', 10);

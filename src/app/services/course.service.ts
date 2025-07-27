@@ -6,37 +6,11 @@ const createCourse = async (data: ICourse) => {
   return await Course.create(data);
 };
 
-const getAllCourses = async (filters: {
-  programType?: string;
-  category?: string;
-  searchQuery?: string;
-}) => {
-  const { programType, category, searchQuery } = filters;
-  const query: any = {};
-
-  if (programType) {
-    query.programType = programType;
-  }
-
-  if (category) {
-    query.category = category;
-  }
-
-  if (searchQuery) {
-    const searchRegex = new RegExp(searchQuery, 'i');
-
-    query.$or = [
-      { name: { $regex: searchRegex } },
-      { description: { $regex: searchRegex } },
-      { subject: { $regex: searchRegex } },
-    ];
-  }
-
-  return await Course.find(query).sort('-createdAt');
+const getAllCourses = async () => {
+  return await Course.find().populate('universityId').sort('-createdAt');
 };
-
 const getSingleCourse = async (id: string) => {
-  return await Course.findById(id).populate('universityId');
+  return await Course.findById(id).populate('universityId', 'name');
 };
 
 const updateCourse = async (id: string, data: Partial<ICourse>) => {
