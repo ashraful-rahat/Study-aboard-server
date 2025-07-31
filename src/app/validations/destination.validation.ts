@@ -14,7 +14,7 @@ const destinationValidationSchema = z.object({
       .trim()
       .min(1, 'Country cannot be empty'),
 
-    photo: z.string().optional().nullable(), // changed here
+    photo: z.string().optional().nullable(),
 
     bestTimeToVisit: z.string().optional().nullable(),
 
