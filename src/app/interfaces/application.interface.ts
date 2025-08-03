@@ -4,9 +4,12 @@ export interface IApplication {
   user: Types.ObjectId;
   course: Types.ObjectId;
   university: Types.ObjectId;
-  destination?: Types.ObjectId; // optional denormalized destination reference
-  documents?: string;
+  destination?: Types.ObjectId;
+  sscResult?: string;
+  hscResult?: string;
+  ieltsResult?: string;
   photo?: string;
   status?: 'pending' | 'approved' | 'rejected';
   remarks?: string | null;
+  background?: 'science' | 'commerce' | 'arts';
 }

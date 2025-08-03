@@ -23,30 +23,34 @@ const ApplicationSchema = new Schema<IApplication>(
       ref: 'University',
       required: true,
     },
-
-    // Optional: denormalized destination
     destination: {
       type: Schema.Types.ObjectId,
       ref: 'Destination',
       required: false,
     },
 
-    documents: {
+    sscResult: {
       type: String,
-      validate: {
-        validator: isValidURL,
-        message: 'Documents must be a valid URL',
-      },
-      default: null,
+      validate: [isValidURL, 'SSC result must be a valid URL'],
+    },
+    hscResult: {
+      type: String,
+      validate: [isValidURL, 'HSC result must be a valid URL'],
+    },
+    ieltsResult: {
+      type: String,
+      validate: [isValidURL, 'IELTS result must be a valid URL'],
     },
 
     photo: {
       type: String,
-      validate: {
-        validator: isValidURL,
-        message: 'Photo must be a valid URL',
-      },
+      validate: [isValidURL, 'Photo must be a valid URL'],
       default: null,
+    },
+
+    background: {
+      type: String,
+      enum: ['science', 'commerce', 'arts'],
     },
 
     status: {
