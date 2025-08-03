@@ -29,10 +29,10 @@ const updateDestinationValidationSchema = z.object({
     name: z.string().trim().min(1, 'Name cannot be empty').optional(),
     description: z.string().trim().min(1, 'Description cannot be empty').optional(),
     country: z.string().trim().min(1, 'Country cannot be empty').optional(),
-    photo: z.array(z.string().url('Invalid URL format')).optional().default([]),
+    photo: z.string().url().optional().nullable(),
     bestTimeToVisit: z.string().optional().nullable(),
     visaRequirements: z.string().optional().nullable(),
-    studentVisa: z.string().optional().nullable(), // <-- Add here
+    studentVisa: z.string().optional().nullable(),
   }),
 });
 

@@ -6,6 +6,9 @@ import { cloudinary } from '../utils/cloudinary';
 // CREATE
 const createDestination = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // 🔍 Log raw incoming body and file
+    console.log('🔹 Incoming req.body:', req.body);
+    console.log('🔹 Incoming req.file:', req.file);
     const destinationData =
       typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
 

@@ -22,7 +22,8 @@ app.use(express.json());
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/destination', destinationRoutes);
-app.use('/api/v1/university', universityRoutes);
+
+app.use('/api/v1/universities', universityRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/applications', applicationRoutes);
 

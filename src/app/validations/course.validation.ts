@@ -27,9 +27,12 @@ const updateCourseSchema = z.object({
     description: z.string().optional(),
     duration: z.string().optional(),
     universityId: objectId.optional(),
-    tuitionFee: z.coerce.number().optional(),
+    tuitionFee: z
+      .union([z.number(), z.string().regex(/^\d+(\.\d+)?$/)])
+      .optional()
+      .transform((val) => (typeof val === 'string' ? parseFloat(val) : val)),
     subject: z.string().optional(),
-    photo: z.string().url().optional(),
+    photo: z.string().url().optional().nullable(),
     programType: z.string().optional(),
     category: z.string().optional(),
   }),

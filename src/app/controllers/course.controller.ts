@@ -77,7 +77,8 @@ const updateCourse = async (req: Request, res: Response, next: NextFunction) => 
         await cloudinary.uploader.destroy(publicId);
       }
 
-      courseData.image = req.file.path;
+      // IMPORTANT: match your model field name!
+      courseData.photo = req.file.path;
     }
 
     const result = await courseService.updateCourse(id, courseData);
