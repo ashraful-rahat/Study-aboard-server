@@ -6,24 +6,26 @@ const objectId = z.string().regex(/^[0-9a-fA-F]{24}$/, {
 
 const statusEnum = z.enum(['pending', 'approved', 'rejected']);
 const backgroundEnum = z.enum(['science', 'commerce', 'arts']);
-const fileURL = z.string().url({ message: 'Must be a valid URL' });
+
+// Score fields (as numbers in string format)
+const scoreString = z.string().regex(/^\d+(\.\d{1,2})?$/, {
+  message: 'Must be a valid number (e.g. 5.00 or 6.5)',
+});
 
 const createApplicationSchema = z.object({
-  body: z.object({
-    user: objectId,
-    course: objectId,
-    university: objectId,
-    destination: objectId.optional(),
-
-    sscResult: fileURL.optional(),
-    hscResult: fileURL.optional(),
-    ieltsResult: fileURL.optional(),
-
-    photo: fileURL.optional(),
-    status: statusEnum.optional(),
-    remarks: z.string().nullable().optional(),
-    background: backgroundEnum.optional(),
-  }),
+  course: objectId,
+  university: objectId,
+  user: objectId,
+  destination: objectId.optional(),
+  sscResult: scoreString.optional(),
+  hscResult: scoreString.optional(),
+  ieltsResult: scoreString.optional(),
+  studentNumber: z.string().optional(),
+  email: z.string().email({ message: 'Email must be valid' }).optional(),
+  photo: z.string().optional(),
+  status: statusEnum.optional(),
+  remarks: z.string().nullable().optional(),
+  background: backgroundEnum.optional(),
 });
 
 const updateApplicationSchema = z.object({
@@ -37,11 +39,14 @@ const updateApplicationSchema = z.object({
       university: objectId.optional(),
       destination: objectId.optional(),
 
-      sscResult: fileURL.optional(),
-      hscResult: fileURL.optional(),
-      ieltsResult: fileURL.optional(),
+      sscResult: scoreString.optional(),
+      hscResult: scoreString.optional(),
+      ieltsResult: scoreString.optional(),
 
-      photo: fileURL.optional(),
+      studentNumber: z.string().optional(),
+      email: z.string().email({ message: 'Email must be valid' }).optional(),
+
+      photo: z.string().optional(),
       status: statusEnum.optional(),
       remarks: z.string().nullable().optional(),
       background: backgroundEnum.optional(),

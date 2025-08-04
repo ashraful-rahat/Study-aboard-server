@@ -1,50 +1,30 @@
 import { Schema, model } from 'mongoose';
 import { IApplication } from '../interfaces/application.interface';
 
-const isValidURL = (val: string) => {
+const isValidEmail = (val: string) => {
   if (!val) return true;
-  return val.startsWith('http://') || val.startsWith('https://');
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 };
 
 const ApplicationSchema = new Schema<IApplication>(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    course: {
-      type: Schema.Types.ObjectId,
-      ref: 'Course',
-      required: true,
-    },
-    university: {
-      type: Schema.Types.ObjectId,
-      ref: 'University',
-      required: true,
-    },
-    destination: {
-      type: Schema.Types.ObjectId,
-      ref: 'Destination',
-      required: false,
-    },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    course: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
+    university: { type: Schema.Types.ObjectId, ref: 'University', required: true },
+    destination: { type: Schema.Types.ObjectId, ref: 'Destination', required: false },
 
-    sscResult: {
+    sscResult: { type: String },
+    hscResult: { type: String },
+    ieltsResult: { type: String },
+
+    studentNumber: { type: String },
+    email: {
       type: String,
-      validate: [isValidURL, 'SSC result must be a valid URL'],
-    },
-    hscResult: {
-      type: String,
-      validate: [isValidURL, 'HSC result must be a valid URL'],
-    },
-    ieltsResult: {
-      type: String,
-      validate: [isValidURL, 'IELTS result must be a valid URL'],
+      validate: [isValidEmail, 'Email must be valid'],
     },
 
     photo: {
       type: String,
-      validate: [isValidURL, 'Photo must be a valid URL'],
       default: null,
     },
 

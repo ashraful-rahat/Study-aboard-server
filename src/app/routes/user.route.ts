@@ -1,5 +1,4 @@
 import express from 'express';
-
 import { UserValidation } from '../validations/user.validation';
 import validateRequest from '../middlewares/validateRequest';
 import { userController } from '../controllers/user.controller';
@@ -10,7 +9,7 @@ import { authorizeRoles } from '../middlewares/authorize';
 
 const router = express.Router();
 
-// Middleware add করো এখানে
+// Admin-only routes below
 router.use(authMiddleware);
 router.use(authorizeRoles('admin'));
 

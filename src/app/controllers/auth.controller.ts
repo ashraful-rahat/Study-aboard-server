@@ -3,9 +3,11 @@ import { authService } from '../services/auth.service';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, age, photo } = req.body;
+    // ১. req.body থেকে সব প্রয়োজনীয় ডেটা (role সহ) destructure করা হয়েছে
+    const { name, email, password, age, role } = req.body; // ২. req.file থেকে ছবির পাথ নেওয়া হয়েছে
+    const photo = req.file ? req.file.path : undefined; // ৩. authService ফাংশনে সব ডেটা পাঠানো হয়েছে
 
-    const result = await authService.registerUser(name, email, password, age, photo);
+    const result = await authService.registerUser(name, email, password, age, photo, role);
 
     res.status(201).json({
       success: true,
@@ -19,7 +21,6 @@ export const register = async (req: Request, res: Response) => {
     });
   }
 };
-
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;

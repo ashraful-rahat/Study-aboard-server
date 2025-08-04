@@ -1,36 +1,25 @@
 import express from 'express';
 import { applicationController } from '../controllers/application.controller';
-import validateRequest from '../middlewares/validateRequest';
-import { ApplicationValidation } from '../validations/application.validation';
 import { uploadSingle } from '../middlewares/upload';
 import { parseJsonData } from '../middlewares/parseJsonData';
+import { authMiddleware } from '../middlewares/auth';
 
 const router = express.Router();
 
 router.post(
   '/create-application',
+  authMiddleware,
   uploadSingle,
   parseJsonData,
-  validateRequest(ApplicationValidation.createApplicationSchema),
   applicationController.createApplication,
 );
 
 router.get('/', applicationController.getAllApplications);
-router.get(
-  '/:id',
-  validateRequest(ApplicationValidation.getApplicationSchema),
-  applicationController.getSingleApplication,
-);
-router.patch(
-  '/:id',
-  uploadSingle,
-  validateRequest(ApplicationValidation.updateApplicationSchema),
-  applicationController.updateApplication,
-);
-router.delete(
-  '/:id',
-  validateRequest(ApplicationValidation.getApplicationSchema),
-  applicationController.deleteApplication,
-);
+
+router.get('/:id', applicationController.getSingleApplication);
+
+router.patch('/:id', uploadSingle, applicationController.updateApplication);
+
+router.delete('/:id', applicationController.deleteApplication);
 
 export const applicationRoutes = router;

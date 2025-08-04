@@ -2,10 +2,30 @@ import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status';
 import { applicationService } from '../services/application.service';
 
-const createApplication = async (req: Request, res: Response, next: NextFunction) => {
+// JWT auth middleware দ্বারা user সংযুক্ত করা হলে req.user থাকবে
+interface AuthenticatedRequest extends Request {
+  user?: { _id?: string };
+}
+
+const createApplication = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const data = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
+
     if (req.file) data.photo = req.file.path;
+
+    const userId = req.user?._id;
+
+    if (!userId) {
+      res.status(httpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    data.user = userId;
+
     const result = await applicationService.createApplication(data);
     res.status(httpStatus.CREATED).json({ status: 'success', data: result });
   } catch (error) {
@@ -13,7 +33,11 @@ const createApplication = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-const getAllApplications = async (req: Request, res: Response, next: NextFunction) => {
+const getAllApplications = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const result = await applicationService.getAllApplications();
     res.status(httpStatus.OK).json({ status: 'success', results: result.length, data: result });
@@ -31,15 +55,16 @@ const getSingleApplication = async (
     const result = await applicationService.getSingleApplication(req.params.id);
 
     if (!result) {
-      res.status(404).json({ status: 'fail', message: 'Application not found' });
+      res.status(httpStatus.NOT_FOUND).json({ status: 'fail', message: 'Application not found' });
       return;
     }
 
-    res.status(200).json({ status: 'success', data: result });
+    res.status(httpStatus.OK).json({ status: 'success', data: result });
   } catch (error) {
     next(error);
   }
 };
+
 const updateApplication = async (
   req: Request,
   res: Response,
@@ -56,11 +81,11 @@ const updateApplication = async (
     const result = await applicationService.updateApplication(id, data);
 
     if (!result) {
-      res.status(404).json({ status: 'fail', message: 'Application not found' });
+      res.status(httpStatus.NOT_FOUND).json({ status: 'fail', message: 'Application not found' });
       return;
     }
 
-    res.status(200).json({
+    res.status(httpStatus.OK).json({
       status: 'success',
       message: 'Application updated successfully',
       data: result,
@@ -79,11 +104,13 @@ const deleteApplication = async (
     const result = await applicationService.deleteApplication(req.params.id);
 
     if (!result) {
-      res.status(404).json({ status: 'fail', message: 'Application not found' });
+      res.status(httpStatus.NOT_FOUND).json({ status: 'fail', message: 'Application not found' });
       return;
     }
 
-    res.status(200).json({ status: 'success', message: 'Application deleted successfully' });
+    res
+      .status(httpStatus.OK)
+      .json({ status: 'success', message: 'Application deleted successfully' });
   } catch (error) {
     next(error);
   }

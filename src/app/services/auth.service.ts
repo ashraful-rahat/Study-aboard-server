@@ -1,5 +1,5 @@
+// auth.service.ts
 import bcrypt from 'bcryptjs';
-
 import jwt from 'jsonwebtoken';
 import { UserModel } from '../models/user.model';
 
@@ -43,6 +43,8 @@ const registerUser = async (
   password: string,
   age: number,
   photo?: string,
+  // ✅ role parameter added here
+  role?: string,
 ) => {
   const existingUser = await UserModel.findOne({ email });
   if (existingUser) {
@@ -57,7 +59,8 @@ const registerUser = async (
     password: hashedPassword,
     age,
     photo,
-    role: 'user',
+    // ✅ This is where the fix is: use the provided role, or default to 'user'
+    role: role || 'user',
   });
 
   const token = jwt.sign(
@@ -65,7 +68,6 @@ const registerUser = async (
     process.env.JWT_SECRET as string,
     { expiresIn: '7d' },
   );
-  console.log('Generated Token:', token);
 
   return {
     accessToken: token,
