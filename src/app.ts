@@ -6,6 +6,7 @@ import { destinationRoutes } from './app/routes/destination.route';
 import { universityRoutes } from './app/routes/university.route';
 import { courseRoutes } from './app/routes/course.route';
 import { applicationRoutes } from './app/routes/application.route';
+import { serviceRoutes } from './app/routes/services.route';
 
 const app: Application = express();
 
@@ -22,7 +23,7 @@ app.use(express.json());
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/destination', destinationRoutes);
-
+app.use('/api/v1/services', serviceRoutes);
 app.use('/api/v1/universities', universityRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/applications', applicationRoutes);

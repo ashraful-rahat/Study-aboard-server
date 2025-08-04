@@ -17,7 +17,7 @@ const createApplication = async (
 
     if (req.file) data.photo = req.file.path;
 
-    const userId = req.user?._id;
+    const userId = req.user?._id; // <-- here
 
     if (!userId) {
       res.status(httpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
