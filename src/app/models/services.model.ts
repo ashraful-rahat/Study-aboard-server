@@ -1,21 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IService, IFAQItem } from '../interfaces/services.interface';
 
-export interface IService extends Document {
-  title: string;
-  slug: string;
-  shortDescription: string;
-  content: string; // HTML string from rich text editor
-  icon?: string;
-  coverImage?: string;
-  faq?: {
-    question: string;
-    answer: string;
-  }[];
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const faqSchema = new Schema(
+const faqSchema = new Schema<IFAQItem>(
   {
     question: { type: String, required: true },
     answer: { type: String, required: true },
@@ -28,14 +14,12 @@ const serviceSchema = new Schema<IService>(
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     shortDescription: { type: String, required: true },
-    content: { type: String, required: true }, // rich HTML
+    content: { type: String, required: true },
     icon: { type: String },
     coverImage: { type: String },
     faq: [faqSchema],
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
 const Service = mongoose.models.Service || mongoose.model<IService>('Service', serviceSchema);

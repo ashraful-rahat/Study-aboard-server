@@ -7,6 +7,7 @@ import { universityRoutes } from './app/routes/university.route';
 import { courseRoutes } from './app/routes/course.route';
 import { applicationRoutes } from './app/routes/application.route';
 import { serviceRoutes } from './app/routes/services.route';
+import { blogRoutes } from './app/routes/blog.route';
 
 const app: Application = express();
 
@@ -27,6 +28,7 @@ app.use('/api/v1/services', serviceRoutes);
 app.use('/api/v1/universities', universityRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/applications', applicationRoutes);
+app.use('/api/v1/blogs', blogRoutes);
 
 // Health Check Route
 app.get('/', (req, res) => {
