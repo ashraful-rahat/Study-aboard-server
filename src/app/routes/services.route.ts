@@ -1,17 +1,19 @@
 import express from 'express';
-import { serviceController } from '../controllers/services.controller';
-import { uploadSingle } from '../middlewares/upload';
+import {
+  createService,
+  getAllServices,
+  getSingleService,
+  updateService,
+  deleteService,
+} from '../controllers/services.controller';
+import { upload } from '../utils/cloudinary';
 
 const router = express.Router();
 
-router.get('/', serviceController.getAllServices);
+router.post('/', upload.single('coverImage'), createService);
+router.get('/', getAllServices);
+router.get('/:id', getSingleService);
+router.patch('/:id', upload.single('coverImage'), updateService);
+router.delete('/:id', deleteService);
 
-router.post('/', uploadSingle, serviceController.createService);
-
-router.get('/:id', serviceController.getSingleService);
-
-router.patch('/:id', uploadSingle, serviceController.updateService);
-
-router.delete('/:id', serviceController.deleteService);
-
-export const serviceRoutes = router;
+export default router;

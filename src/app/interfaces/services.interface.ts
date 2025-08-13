@@ -10,7 +10,7 @@ export interface IService extends Document {
   slug: string;
   shortDescription: string;
   content: string;
-  icon?: string;
+
   coverImage?: string;
   faq?: IFAQItem[];
 }

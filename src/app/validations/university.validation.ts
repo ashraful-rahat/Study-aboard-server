@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Helper to validate a MongoDB ObjectId (24 hex characters)
 const objectIdValidator = z.string().regex(/^[0-9a-fA-F]{24}$/, {
   message: 'Invalid ObjectId',
 });
@@ -12,18 +11,18 @@ const createUniversitySchema = z.object({
     location: z.string().min(1, 'Location is required'),
     destinationId: objectIdValidator,
     establishedYear: z
-      .string()
+      .union([z.string(), z.number()])
       .optional()
       .transform((val) => {
-        if (val === undefined) return undefined;
+        if (val === undefined || val === '') return undefined;
         const num = Number(val);
         if (isNaN(num)) {
-          throw new Error('Invalid number format for establishedYear'); // Or handle with .pipe()
+          throw new Error('Invalid number format for establishedYear');
         }
         return num;
       }),
     website: z.string().url().optional(),
-    photo: z.string().url().optional(), // ✅ added image validation
+    photo: z.string().url().optional(),
   }),
 });
 
@@ -39,9 +38,19 @@ const updateUniversitySchema = z.object({
     description: z.string().optional(),
     location: z.string().optional(),
     destinationId: objectIdValidator.optional(),
-    establishedYear: z.number().optional(),
+    establishedYear: z
+      .union([z.string(), z.number()])
+      .optional()
+      .transform((val) => {
+        if (val === undefined || val === '') return undefined;
+        const num = Number(val);
+        if (isNaN(num)) {
+          throw new Error('Invalid number format for establishedYear');
+        }
+        return num;
+      }),
     website: z.string().url().optional(),
-    photo: z.string().url().optional(), // ✅ added image validation
+    photo: z.string().url().optional(),
   }),
   params: z.object({
     id: objectIdValidator,

@@ -28,11 +28,24 @@ const updateCourseSchema = z.object({
     duration: z.string().optional(),
     universityId: objectId.optional(),
     tuitionFee: z
-      .union([z.number(), z.string().regex(/^\d+(\.\d+)?$/)])
+      .union([
+        z.number(),
+        z
+          .string()
+          .trim()
+          .regex(/^\d+(\.\d+)?$/)
+          .optional()
+          .or(z.literal('')),
+      ])
       .optional()
-      .transform((val) => (typeof val === 'string' ? parseFloat(val) : val)),
+      .transform((val) => {
+        if (typeof val === 'string' && val.trim() === '') {
+          return undefined; // বা null, আপনার প্রয়োজন অনুযায়ী
+        }
+        return typeof val === 'string' ? parseFloat(val) : val;
+      }),
     subject: z.string().optional(),
-    photo: z.string().url().optional().nullable(),
+    photo: z.string().optional().nullable(),
     programType: z.string().optional(),
     category: z.string().optional(),
   }),

@@ -66,7 +66,9 @@ const getSingleCourse = async (req: Request, res: Response, next: NextFunction) 
 const updateCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const courseData = req.body;
+
+    // FIX: Parse data if sent as string
+    const courseData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
 
     if (req.file) {
       const existing = await courseService.getSingleCourse(id);
@@ -77,7 +79,6 @@ const updateCourse = async (req: Request, res: Response, next: NextFunction) => 
         await cloudinary.uploader.destroy(publicId);
       }
 
-      // IMPORTANT: match your model field name!
       courseData.photo = req.file.path;
     }
 

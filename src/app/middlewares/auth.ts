@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
 export interface AuthenticatedRequest extends Request {
   user?: any;
@@ -27,5 +28,3 @@ export const authMiddleware = (
     return; // return করতে হবে
   }
 };
-
-import jwt from 'jsonwebtoken';

@@ -25,6 +25,7 @@ router.get(
 router.patch(
   '/:id',
   uploadSingle,
+  parseJsonData, // এটা validateRequest এর আগে দিতে হবে
   validateRequest(CourseValidation.updateCourseSchema),
   courseController.updateCourse,
 );

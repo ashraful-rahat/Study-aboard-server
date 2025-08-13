@@ -1,19 +1,24 @@
+// controllers/services.controller.ts
 import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status';
-
 import { cloudinary } from '../utils/cloudinary';
 import { serviceService } from '../services/services.service';
 
-// CREATE
 const createService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const data = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
+    const serviceData = {
+      ...req.body,
+      faq: JSON.parse(req.body.faq),
+    };
 
     if (req.file) {
-      data.coverImage = req.file.path;
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        resource_type: 'image',
+      });
+      serviceData.coverImage = uploadResult.secure_url;
     }
 
-    const result = await serviceService.createService(data);
+    const result = await serviceService.createService(serviceData);
 
     res.status(httpStatus.CREATED).json({
       status: 'success',
@@ -21,9 +26,15 @@ const createService = async (req: Request, res: Response, next: NextFunction): P
       data: result,
     });
   } catch (error: any) {
-    if (req.file) {
+    if (req.file && req.file.path) {
       const publicId = req.file.path.split('/').pop()?.split('.')[0];
-      if (publicId) await cloudinary.uploader.destroy(publicId);
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (cloudinaryError) {
+          console.error('Cloudinary error during cleanup:', cloudinaryError);
+        }
+      }
     }
 
     if (error.code === 11000) {
@@ -38,7 +49,6 @@ const createService = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-// READ - All
 const getAllServices = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const result = await serviceService.getAllServices();
@@ -52,7 +62,6 @@ const getAllServices = async (_req: Request, res: Response, next: NextFunction):
   }
 };
 
-// READ - Single
 const getSingleService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const result = await serviceService.getServiceById(req.params.id);
@@ -81,19 +90,30 @@ const getSingleService = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-// UPDATE
 const updateService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-    const updateData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
+    const updateData = {
+      ...req.body,
+      faq: JSON.parse(req.body.faq),
+    };
 
     if (req.file) {
       const existing = await serviceService.getServiceById(id);
       if (existing?.coverImage) {
         const publicId = existing.coverImage.split('/').pop()?.split('.')[0];
-        if (publicId) await cloudinary.uploader.destroy(publicId);
+        if (publicId) {
+          try {
+            await cloudinary.uploader.destroy(publicId);
+          } catch (cloudinaryError) {
+            console.error('Cloudinary error during old image deletion:', cloudinaryError);
+          }
+        }
       }
-      updateData.coverImage = req.file.path;
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        resource_type: 'image',
+      });
+      updateData.coverImage = uploadResult.secure_url;
     }
 
     const result = await serviceService.updateService(id, updateData);
@@ -112,9 +132,15 @@ const updateService = async (req: Request, res: Response, next: NextFunction): P
       data: result,
     });
   } catch (error: any) {
-    if (req.file) {
+    if (req.file && req.file.path) {
       const publicId = req.file.path.split('/').pop()?.split('.')[0];
-      if (publicId) await cloudinary.uploader.destroy(publicId);
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (cloudinaryError) {
+          console.error('Cloudinary error during new image deletion:', cloudinaryError);
+        }
+      }
     }
 
     if (error.code === 11000) {
@@ -129,13 +155,18 @@ const updateService = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-// DELETE
 const deleteService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const existing = await serviceService.getServiceById(req.params.id);
     if (existing?.coverImage) {
       const publicId = existing.coverImage.split('/').pop()?.split('.')[0];
-      if (publicId) await cloudinary.uploader.destroy(publicId);
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (cloudinaryError) {
+          console.error('Cloudinary error during image deletion:', cloudinaryError);
+        }
+      }
     }
 
     const result = await serviceService.deleteService(req.params.id);
@@ -157,10 +188,19 @@ const deleteService = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-export const serviceController = {
+export {
   createService,
   getAllServices,
   getSingleService,
   updateService,
   deleteService,
 };
+
+// Remove or comment out this export if you want to use named exports
+// export const serviceController = {
+//   createService,
+//   getAllServices,
+//   getSingleService,
+//   updateService,
+//   deleteService,
+// };

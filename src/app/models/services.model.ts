@@ -15,7 +15,7 @@ const serviceSchema = new Schema<IService>(
     slug: { type: String, required: true, unique: true },
     shortDescription: { type: String, required: true },
     content: { type: String, required: true },
-    icon: { type: String },
+
     coverImage: { type: String },
     faq: [faqSchema],
   },
