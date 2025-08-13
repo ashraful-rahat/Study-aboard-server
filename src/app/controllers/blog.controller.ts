@@ -23,11 +23,10 @@ export const blogController = {
         });
       }
 
-      // Access uploaded file from req.file. If no file, set coverImage to null
+      // Access uploaded file from req.file. If no file, coverImage property is not set.
       if (req.file) {
+        // ⭐ লজিক ঠিক করা হয়েছে
         blogData.coverImage = req.file.path;
-      } else {
-        blogData.coverImage = null;
       }
 
       // Parse tags gracefully. If not a string, it becomes an empty array.
@@ -122,9 +121,12 @@ export const blogController = {
         updateData.coverImage = req.file.path;
       }
 
-      // Parse tags gracefully
-      if (typeof updateData.tags === 'string') {
-        updateData.tags = updateData.tags.split(',').map((tag: string) => tag.trim());
+      // Parse tags gracefully ONLY if tags field is present
+      if (updateData.tags) {
+        // ⭐ লজিক ঠিক করা হয়েছে
+        if (typeof updateData.tags === 'string') {
+          updateData.tags = updateData.tags.split(',').map((tag: string) => tag.trim());
+        }
       }
 
       const result = await blogService.updateBlog(id, updateData);

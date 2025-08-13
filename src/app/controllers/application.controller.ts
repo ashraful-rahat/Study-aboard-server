@@ -4,7 +4,7 @@ import { applicationService } from '../services/application.service';
 
 // JWT auth middleware দ্বারা user সংযুক্ত করা হলে req.user থাকবে
 interface AuthenticatedRequest extends Request {
-  user?: { _id?: string };
+  user?: { id?: string };
 }
 
 const createApplication = async (
@@ -13,22 +13,32 @@ const createApplication = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const data = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
+    console.log('🟢 createApplication controller started...');
 
+    const data = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body;
     if (req.file) data.photo = req.file.path;
 
-    const userId = req.user?._id; // <-- here
+    console.log('🔍 Value of req.user:', req.user);
+
+    const userId = req.user?.id; // ⭐⭐ এখানে "_id" এর বদলে "id" ব্যবহার করো ⭐⭐
+
+    console.log('🔍 Extracted userId:', userId);
 
     if (!userId) {
+      console.log('❌ Error: userId is missing, sending 401 Unauthorized');
       res.status(httpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       return;
     }
 
     data.user = userId;
+    console.log('✅ Data to be sent to service:', data);
 
     const result = await applicationService.createApplication(data);
+    console.log('🎉 Application created successfully!');
+
     res.status(httpStatus.CREATED).json({ status: 'success', data: result });
   } catch (error) {
+    console.log('❗ An error occurred in createApplication:', error);
     next(error);
   }
 };
@@ -60,7 +70,13 @@ const getSingleApplication = async (
     }
 
     res.status(httpStatus.OK).json({ status: 'success', data: result });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'CastError') {
+      res
+        .status(httpStatus.BAD_REQUEST)
+        .json({ status: 'fail', message: 'Invalid application ID format' });
+      return;
+    }
     next(error);
   }
 };

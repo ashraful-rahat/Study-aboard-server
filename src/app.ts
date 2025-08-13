@@ -7,12 +7,14 @@ import { universityRoutes } from './app/routes/university.route';
 import { courseRoutes } from './app/routes/course.route';
 import { applicationRoutes } from './app/routes/application.route';
 import blogRoutes from './app/routes/blog.route';
+import dotenv from 'dotenv';
 
 // To this
 import serviceRoutes from './app/routes/services.route';
 
 const app: Application = express();
 
+dotenv.config();
 // Middlewares
 app.use(
   cors({
@@ -30,14 +32,9 @@ app.use('/api/v1/services', serviceRoutes);
 app.use('/api/v1/universities', universityRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/applications', applicationRoutes);
-app.use('/api/v1/blog', blogRoutes);
-
-
-
+app.use('/api/v1/blogs', blogRoutes);
 
 // To this
-
-
 
 // Health Check Route
 app.get('/', (req, res) => {

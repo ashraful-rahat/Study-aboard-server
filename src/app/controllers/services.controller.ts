@@ -58,13 +58,18 @@ const getAllServices = async (_req: Request, res: Response, next: NextFunction):
       data: result,
     });
   } catch (error) {
-    next(error);
+    next(error); // ⭐ ত্রুটি হ্যান্ডলিং যোগ করা হয়েছে
   }
 };
 
 const getSingleService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const result = await serviceService.getServiceById(req.params.id);
+    const { slug } = req.params;
+    console.log('Searching for slug:', slug); // ⭐ এইখানে console.log যোগ করুন
+
+    const result = await serviceService.getServiceBySlug(slug);
+
+    console.log('Database query result:', result); // ⭐ এটি কি null দেখাচ্ছে?
 
     if (!result) {
       res.status(httpStatus.NOT_FOUND).json({
@@ -79,13 +84,6 @@ const getSingleService = async (req: Request, res: Response, next: NextFunction)
       data: result,
     });
   } catch (error: any) {
-    if (error.name === 'CastError') {
-      res.status(httpStatus.BAD_REQUEST).json({
-        status: 'fail',
-        message: 'Invalid service ID format',
-      });
-      return;
-    }
     next(error);
   }
 };
@@ -188,19 +186,10 @@ const deleteService = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-export {
+export const serviceController = {
   createService,
   getAllServices,
   getSingleService,
   updateService,
   deleteService,
 };
-
-// Remove or comment out this export if you want to use named exports
-// export const serviceController = {
-//   createService,
-//   getAllServices,
-//   getSingleService,
-//   updateService,
-//   deleteService,
-// };
